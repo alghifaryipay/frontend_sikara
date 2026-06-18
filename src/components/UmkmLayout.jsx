@@ -6,7 +6,6 @@ const UmkmLayout = ({ children }) => {
   const location = useLocation();
   const [profile, setProfile] = useState({ name: 'Pemilik Usaha', email: 'mitra@umkm.com', shopName: 'Toko Saya' });
 
-  // 🔥 AMBIL DATA NAMA DAN LOGO DARI BROWSER (LOCALSTORAGE)
   const businessName = localStorage.getItem('businessName') || 'Mitra SIKaRa';
   const logoUrl = localStorage.getItem('logoUrl') || '/logo1.png';
 

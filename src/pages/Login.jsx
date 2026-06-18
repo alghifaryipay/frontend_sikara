@@ -57,7 +57,7 @@ const Login = () => {
                 
                 // 🔥 PERBAIKAN: TAMBAHKAN PENYIMPANAN LOGO DAN NAMA USAHA!
                 localStorage.setItem('logoUrl', data.user?.logo_url || '/logo1.png');
-                localStorage.setItem('businessName', data.user?.name || ''); // Default ke nama pemilik jika nama usaha belum diambil
+                localStorage.setItem('businessName', data.user?.business_name || data.user?.name || 'Mitra SIKaRa'); // Default ke nama pemilik jika nama usaha belum diambil
 
                 alert('Login Berhasil!');
 
