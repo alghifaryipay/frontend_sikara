@@ -101,7 +101,7 @@ const LandingPage = () => {
           {isLogged ? (
             <>
               <span className={`hidden md:block text-xs font-bold ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>Halo, {userName}</span>
-              
+
               <button onClick={handleLogout} className={`font-bold text-xs px-4 py-2 rounded-xl transition-colors ${isDarkMode ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-red-50 hover:bg-red-100 text-red-500'}`}>
                 Keluar
               </button>
@@ -138,23 +138,27 @@ const LandingPage = () => {
             <div key={umkm.id} className="flex flex-col items-center gap-2 cursor-pointer group">
               <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border shadow-sm transition-all flex items-center justify-center group-hover:scale-105 group-hover:ring-2 ring-blue-500/50 ${isDarkMode ? 'bg-slate-700 border-slate-600 text-blue-400 group-hover:bg-blue-500 group-hover:text-white' : 'bg-blue-50 border-blue-100 text-blue-500 group-hover:bg-blue-500 group-hover:text-white'}`}>
 
-                {/* 🔥 KUNCI UTAMA: Jika ada logo_url di database, tampilkan! Jika tidak, baru pakai inisial huruf */}
                 {umkm.logo_url ? (
                   <img
                     src={umkm.logo_url}
                     alt={umkm.business_name}
                     className="w-full h-full object-cover bg-white"
                     onError={(e) => {
-                      // Jika link rusak/error, otomatis copot gambarnya dan tampilkan huruf inisial saja
+                      // Fallback kuat jika gambar gagal dimuat
+                      e.target.onerror = null; // Mencegah looping error
                       e.target.style.display = 'none';
-                      e.target.parentElement.innerHTML = `<span class="text-xl md:text-2xl font-black uppercase">${umkm.business_name.charAt(0)}</span>`;
+                      e.target.nextElementSibling.style.display = 'flex'; // Tampilkan inisial huruf
                     }}
                   />
-                ) : (
-                  <span className="text-xl md:text-2xl font-black uppercase">
-                    {umkm.business_name.charAt(0)}
-                  </span>
-                )}
+                ) : null}
+
+                {/* Elemen Inisial (Tersembunyi secara default jika ada gambar, atau selalu tampil jika logo_url null) */}
+                <span
+                  className="text-xl md:text-2xl font-black uppercase flex items-center justify-center w-full h-full"
+                  style={{ display: umkm.logo_url ? 'none' : 'flex' }}
+                >
+                  {umkm.business_name ? umkm.business_name.charAt(0) : '?'}
+                </span>
 
               </div>
               <span className={`text-[10px] md:text-[11px] font-bold text-center line-clamp-1 w-16 group-hover:text-blue-500 ${isDarkMode ? 'text-slate-300' : 'text-gray-600'}`}>
