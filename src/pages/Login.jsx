@@ -54,6 +54,10 @@ const Login = () => {
                 localStorage.setItem('userId', String(data.user?.id || '')); 
                 localStorage.setItem('name', data.user?.name || data.name || ''); 
                 localStorage.setItem('email', data.user?.email || data.email || '');
+                
+                // 🔥 PERBAIKAN: TAMBAHKAN PENYIMPANAN LOGO DAN NAMA USAHA!
+                localStorage.setItem('logoUrl', data.user?.logo_url || '/logo1.png');
+                localStorage.setItem('businessName', data.user?.name || ''); // Default ke nama pemilik jika nama usaha belum diambil
 
                 alert('Login Berhasil!');
 
