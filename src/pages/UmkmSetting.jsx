@@ -7,6 +7,8 @@ const UmkmSetting = () => {
 
   // State untuk menyimpan file fisik dari PC
   const [selectedFile, setSelectedFile] = useState(null);
+  
+  const [categories, setCategories] = useState([]);
 
   const [formData, setFormData] = useState({
     business_name: '',
@@ -18,6 +20,7 @@ const UmkmSetting = () => {
   });
 
   useEffect(() => {
+    // Ambil data profil UMKM
     fetch(`https://backend-sikara.onrender.com/api/umkm/profile/${userId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -35,6 +38,13 @@ const UmkmSetting = () => {
         console.error('Error load profile:', err);
         setLoading(false);
       });
+
+    fetch(`https://backend-sikara.onrender.com/api/admin/categories`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((err) => console.error('Error load categories:', err));
   }, [userId]);
 
   // Fungsi mendeteksi file yang dipilih dari PC
@@ -77,7 +87,7 @@ const UmkmSetting = () => {
       }
     }
 
-    // 🔥 PERBAIKAN: Lanjutkan simpan teks data profil (SEKARANG LOGO IKUT DIKIRIM)
+    // Lanjutkan simpan teks data profil (SEKARANG LOGO IKUT DIKIRIM)
     fetch(`https://backend-sikara.onrender.com/api/umkm/profile/${userId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -156,12 +166,19 @@ const UmkmSetting = () => {
             </div>
             <div>
               <label className="block text-slate-500 uppercase tracking-wider text-[10px] mb-1">Kategori Sektor Usaha</label>
-              <input
-                type="text"
+              {/* 🔥 TAMBAHAN 3: Input teks diubah menjadi Dropdown Select */}
+              <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white text-slate-800 text-xs"
-              />
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white text-slate-800 text-xs cursor-pointer"
+              >
+                <option value="" disabled>Pilih Kategori Usaha...</option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
