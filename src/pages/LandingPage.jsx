@@ -172,7 +172,7 @@ const LandingPage = () => {
         <div className="space-y-6">
           <div className="text-center space-y-1">
             <h2 className={`text-xl md:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Rekomendasi Pilihan</h2>
-            <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-400'}`}>Dukung usaha lokal dengan membeli produk karya anak bangsa</p>
+            <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-400'}`}>Dukung usaha lokal dengan membeli produk di SiKaRa</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
