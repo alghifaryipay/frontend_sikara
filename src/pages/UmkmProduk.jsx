@@ -13,15 +13,22 @@ const UmkmProduk = () => {
 
   // State untuk mengendalikan Modal Tambah & Edit Produk
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false); // Deteksi mode Edit/Tambah
-  const [editId, setEditId] = useState(null); // Menyimpan ID produk yang diedit
+  const [isEditMode, setIsEditMode] = useState(false); 
+  const [editId, setEditId] = useState(null); 
+  
+  // State Khusus Loading saat Upload
+  const [isUploading, setIsUploading] = useState(false);
+
+  // 🔥 STATE BARU KHUSUS UPLOAD GAMBAR
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
     category_name: '',
     price: '',
     stock: '',
-    image_url: ''
+    image_url: '' // Akan menampung hasil link dari server
   });
 
   // Fungsi Tarik Data dari Database
@@ -35,7 +42,7 @@ const UmkmProduk = () => {
       .then((resData) => {
         setData({
           businessName: resData.businessName,
-          umkmId: resData.umkmId, // Ambil ID Profil Toko
+          umkmId: resData.umkmId,
           products: resData.products || []
         });
         setLoading(false);
@@ -55,6 +62,8 @@ const UmkmProduk = () => {
     setIsEditMode(false);
     setEditId(null);
     setFormData({ title: '', category_name: '', price: '', stock: '', image_url: '' });
+    setSelectedFile(null);
+    setPreviewUrl('');
     setIsModalOpen(true);
   };
 
@@ -69,11 +78,22 @@ const UmkmProduk = () => {
       stock: prod.stock,
       image_url: prod.image_url || ''
     });
+    setSelectedFile(null);
+    setPreviewUrl(prod.image_url || ''); // Tampilkan gambar lama jika ada
     setIsModalOpen(true);
   };
 
+  // 🔥 FUNGSI BARU: Deteksi file yang dipilih dari PC
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Buat URL preview sementara di browser
+    }
+  };
+
   // Fungsi Submit Data Produk (Menangani Tambah & Edit Sekaligus)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!data.umkmId) {
@@ -81,12 +101,43 @@ const UmkmProduk = () => {
       return;
     }
 
+    setIsUploading(true);
+    let finalImageUrl = formData.image_url;
+
+    // 🔥 JIKA USER MEMILIH FILE BARU DARI PC, UPLOAD DULU GAMBARNYA!
+    if (selectedFile) {
+      const uploadData = new FormData();
+      uploadData.append('image', selectedFile);
+
+      try {
+        const uploadRes = await fetch('https://backend-sikara.onrender.com/api/upload', {
+          method: 'POST',
+          body: uploadData
+        });
+        const uploadResult = await uploadRes.json();
+
+        if (uploadRes.ok) {
+          finalImageUrl = uploadResult.imageUrl; // Dapatkan link permanen dari folder backend
+        } else {
+          alert('Gagal mengupload gambar ke server.');
+          setIsUploading(false);
+          return; // Hentikan proses simpan jika upload gagal
+        }
+      } catch (err) {
+        console.error('Error upload:', err);
+        alert('Server gagal memproses gambar.');
+        setIsUploading(false);
+        return;
+      }
+    }
+
+    // Lanjutkan simpan teks data produk ke database dengan URL gambar final
     const payload = {
       umkm_id: data.umkmId,
-      ...formData
+      ...formData,
+      image_url: finalImageUrl 
     };
 
-    // Tentukan URL & Method berdasarkan mode (POST untuk tambah, PUT untuk edit)
     const url = isEditMode 
       ? `https://backend-sikara.onrender.com/api/umkm/products/${editId}` 
       : 'https://backend-sikara.onrender.com/api/umkm/products';
@@ -100,10 +151,11 @@ const UmkmProduk = () => {
       .then((res) => res.json())
       .then((resData) => {
         alert(resData.message || 'Perubahan berhasil disimpan!');
-        setIsModalOpen(false); // Tutup Modal
-        fetchProducts(); // Refresh isi tabel otomatis
+        setIsModalOpen(false); 
+        fetchProducts(); 
       })
-      .catch((err) => console.error("Gagal memproses produk:", err));
+      .catch((err) => console.error("Gagal memproses produk:", err))
+      .finally(() => setIsUploading(false));
   };
 
   // Fungsi Hapus Produk
@@ -115,7 +167,7 @@ const UmkmProduk = () => {
         .then((res) => res.json())
         .then((resData) => {
           alert(resData.message || 'Produk berhasil dihapus!');
-          fetchProducts(); // Refresh tabel setelah hapus
+          fetchProducts(); 
         })
         .catch((err) => console.error('Error menghapus produk:', err));
     }
@@ -230,8 +282,11 @@ const UmkmProduk = () => {
                             className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                             title="Hapus Produk"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
                             </svg>
                           </button>
                         </div>
@@ -256,7 +311,7 @@ const UmkmProduk = () => {
                     {isEditMode ? 'Edit Data Produk' : 'Tambah Produk Baru'}
                   </h3>
                   <p className="text-[10px] text-gray-400 font-medium">
-                    {isEditMode ? 'Perbarui harga atau stok etalase Anda' : 'Terbitkan komoditas jualan ke ekosistem SIKaRa'}
+                    {isEditMode ? 'Perbarui detail komoditas etalase Anda' : 'Terbitkan komoditas jualan ke ekosistem SIKaRa'}
                   </p>
                 </div>
                 <button 
@@ -269,7 +324,30 @@ const UmkmProduk = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-3">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                
+                {/* 🔥 FITUR BARU: AREA UPLOAD GAMBAR */}
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
+                  <div className="w-16 h-16 bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                    {previewUrl ? (
+                      <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-300">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Foto Produk</label>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="w-full text-slate-500 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer" 
+                    />
+                  </div>
+                </div>
+
                 {/* Nama Produk */}
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Nama Produk</label>
@@ -278,7 +356,7 @@ const UmkmProduk = () => {
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Contoh: Bouquet Mawar Merah Premium"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
                   />
                 </div>
 
@@ -289,9 +367,9 @@ const UmkmProduk = () => {
                     required
                     value={formData.category_name}
                     onChange={(e) => setFormData({...formData, category_name: e.target.value})}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all cursor-pointer"
                   >
-                    <option value="">-- Pilih Kategori Produk --</option>
+                    <option value="" disabled hidden>-- Pilih Kategori Produk --</option>
                     <option value="Kuliner">Kuliner (Makanan & Minuman)</option>
                     <option value="Fashion">Fashion & Pakaian</option>
                     <option value="Kerajinan">Kerajinan Tangan / Bouquet</option>
@@ -309,7 +387,7 @@ const UmkmProduk = () => {
                       value={formData.price}
                       onChange={(e) => setFormData({...formData, price: e.target.value})}
                       placeholder="50000"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
+                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
                     />
                   </div>
                   <div className="space-y-1">
@@ -319,39 +397,29 @@ const UmkmProduk = () => {
                       value={formData.stock}
                       onChange={(e) => setFormData({...formData, stock: e.target.value})}
                       placeholder="25"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
+                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Link URL Gambar */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">URL Gambar Produk (Opsional)</label>
-                  <input 
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                    placeholder="https://example.com/gambar-produk.jpg"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
-                  />
-                </div>
-
                 {/* Tombol Aksi */}
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-3 border-t border-slate-50">
                   <button 
                     type="button"
+                    disabled={isUploading}
                     onClick={() => setIsModalOpen(false)}
-                    className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold py-2.5 rounded-xl transition-colors"
+                    className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold py-3 rounded-xl transition-colors"
                   >
                     Batal
                   </button>
                   <button 
                     type="submit"
-                    className={`w-1/2 text-white text-xs font-bold py-2.5 rounded-xl transition-colors shadow-sm ${
-                      isEditMode ? 'bg-purple-500 hover:bg-purple-600 shadow-purple-100' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-100'
+                    disabled={isUploading}
+                    className={`w-1/2 text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm ${
+                      isUploading ? 'bg-blue-300' : isEditMode ? 'bg-purple-500 hover:bg-purple-600 shadow-purple-100' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-100'
                     }`}
                   >
-                    {isEditMode ? 'Simpan Perubahan' : 'Terbitkan Produk'}
+                    {isUploading ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Terbitkan Produk'}
                   </button>
                 </div>
               </form>
