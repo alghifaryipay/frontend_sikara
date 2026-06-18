@@ -4,7 +4,7 @@ import UmkmLayout from '../components/UmkmLayout';
 const UmkmSetting = () => {
   const userId = localStorage.getItem('userId');
   const [loading, setLoading] = useState(true);
-  
+
   // State untuk menyimpan file fisik dari PC
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -21,14 +21,13 @@ const UmkmSetting = () => {
     fetch(`https://backend-sikara.onrender.com/api/umkm/profile/${userId}`)
       .then((res) => res.json())
       .then((data) => {
-        const savedLogo = localStorage.getItem('logoUrl') || '';
         setFormData({
           business_name: data.business_name || '',
           owner_name: data.owner_name || '',
           phone: data.phone || '',
           location: data.location || '',
           category: data.category || '',
-          logo_url: savedLogo
+          logo_url: data.logo_url || ''
         });
         setLoading(false);
       })
@@ -50,7 +49,7 @@ const UmkmSetting = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     let finalLogoUrl = formData.logo_url;
 
     // 🔥 JIKA USER MEMILIH FILE DARI PC, UPLOAD DULU GAMBARNYA!
@@ -64,7 +63,7 @@ const UmkmSetting = () => {
           body: uploadData
         });
         const uploadResult = await uploadRes.json();
-        
+
         if (uploadRes.ok) {
           finalLogoUrl = uploadResult.imageUrl; // Dapatkan link permanen dari folder backend
         } else {
@@ -95,9 +94,9 @@ const UmkmSetting = () => {
         if (res.ok) {
           localStorage.setItem('businessName', formData.business_name);
           localStorage.setItem('logoUrl', finalLogoUrl); // Simpan link gambar akhir
-          
+
           alert('Pengaturan profil toko berhasil diperbarui!');
-          window.location.reload(); 
+          window.location.reload();
         } else {
           alert('Gagal memperbarui profil toko.');
         }
@@ -180,9 +179,9 @@ const UmkmSetting = () => {
             <h4 className="text-slate-700 font-bold text-[11px] uppercase tracking-wider">Kustomisasi Gambar Logo</h4>
             <div className="flex gap-5 items-center">
               <div className="w-16 h-16 bg-white border rounded-xl overflow-hidden shadow-sm flex items-center justify-center shrink-0">
-                <img 
-                  src={formData.logo_url || '/logo1.png'} 
-                  alt="Preview Logo" 
+                <img
+                  src={formData.logo_url || '/logo1.png'}
+                  alt="Preview Logo"
                   className="w-full h-full object-cover"
                   onError={(e) => { e.target.src = '/logo1.png'; }}
                 />
