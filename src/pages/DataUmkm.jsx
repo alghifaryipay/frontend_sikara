@@ -397,7 +397,7 @@ const DataUmkm = () => {
                 </div>
                 <div className="pt-2 flex justify-end gap-3 border-t border-slate-50">
                   <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
-                  <button type="submit" className="px-4 py-2 text-xs font-semibold bg-orange-500 text-white rounded-xl">Simpan Perubahan</button>
+                  <button type="submit" className="px-4 py-2 text-xs font-semibold bg-blue-500 text-white rounded-xl">Simpan Perubahan</button>
                 </div>
               </form>
             </div>
