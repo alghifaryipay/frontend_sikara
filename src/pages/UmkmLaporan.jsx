@@ -13,7 +13,7 @@ const UmkmLaporan = () => {
       navigate('/login');
       return;
     }
-    fetch(`http://localhost:5000/api/umkm/dashboard-full/${userId}`)
+    fetch(`https://backend-sikara.onrender.com/api/umkm/dashboard-full/${userId}`)
       .then((res) => res.json())
       .then((resData) => {
         setData(resData);

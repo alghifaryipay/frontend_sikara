@@ -4,39 +4,57 @@ import AdminLayout from '../components/AdminLayout';
 import { BuildingIcon, BoxIcon, CheckIcon } from '../components/Icons';
 
 const DashboardAdmin = () => {
-    // State untuk menampung data dinamis dari database
     const [stats, setStats] = useState({ totalUMKM: 0, totalProduk: 0, umkmAktif: 0 });
     const [umkmList, setUmkmList] = useState([]);
+    const [umkmKategori, setUmkmKategori] = useState([]); 
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // Ambil data dari backend saat komponen dimuat
     useEffect(() => {
-        fetch('http://localhost:5000/api/admin/dashboard')
-            .then((res) => {
-                if (!res.ok) throw new Error('Gagal mengambil data');
+        Promise.all([
+            fetch('https://backend-sikara.onrender.com/api/admin/dashboard').then((res) => {
+                if (!res.ok) throw new Error('Gagal muat data dashboard');
+                return res.json();
+            }),
+            fetch('https://backend-sikara.onrender.com/api/admin/laporan').then((res) => {
+                if (!res.ok) throw new Error('Gagal muat data laporan');
                 return res.json();
             })
-            .then((data) => {
-                setStats(data.stats);
-                setUmkmList(data.umkmList);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error('Error fetching admin data:', err);
-                setLoading(false);
-            });
+        ])
+        .then(([dashData, reportData]) => {
+            setStats(dashData.stats);
+            setUmkmList(dashData.umkmList);
+            setUmkmKategori(reportData.umkmKategori || []);
+            setLoading(false);
+        })
+        .catch((err) => {
+            console.error('Error fetching dashboard admin data:', err);
+            setLoading(false);
+        });
     }, []);
 
     if (loading) {
         return (
             <AdminLayout>
                 <div className="flex items-center justify-center min-h-[50vh]">
-                    <p className="text-sm font-medium text-gray-400 animate-pulse">Memuat data real-time database...</p>
+                    <p className="text-sm font-medium text-purple-600 animate-pulse">Menghubungkan data real-time database SIKaRa...</p>
                 </div>
             </AdminLayout>
         );
     }
+
+    // 🎨 Peta Warna Terstandarisasi agar Kontras dan Indah
+    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#a855f7', '#ec4899', '#64748b'];
+
+    // 🧮 Algoritma Akurat Akumulasi Derajat Lingkaran (0% - 100%)
+    let cumulativePercent = 0;
+    const conicGradientString = umkmKategori.length > 0
+        ? umkmKategori.map((kat, index) => {
+            const start = cumulativePercent;
+            cumulativePercent += parseFloat(kat.percent);
+            return `${colors[index % colors.length]} ${start}% ${cumulativePercent}%`;
+          }).join(', ')
+        : '#e2e8f0 0% 100%';
 
     return (
         <AdminLayout>
@@ -47,9 +65,8 @@ const DashboardAdmin = () => {
                     <p className="text-xs text-gray-400 mt-1 font-medium">Pantau data pendaftaran UMKM dan produk secara real-time</p>
                 </div>
 
-                {/* 3 KARTU STATISTIK ATAS (DATA REAL) */}
+                {/* 3 KARTU STATISTIK ATAS */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Card 1: Total UMKM */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
                         <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
                             <BuildingIcon className="w-5 h-5 text-purple-600" />
@@ -61,7 +78,6 @@ const DashboardAdmin = () => {
                         </div>
                     </div>
 
-                    {/* Card 2: Total Produk */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
                         <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                             <BoxIcon className="w-5 h-5 text-blue-600" />
@@ -73,7 +89,6 @@ const DashboardAdmin = () => {
                         </div>
                     </div>
 
-                    {/* Card 3: UMKM Aktif */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
                         <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
                             <CheckIcon className="w-5 h-5 text-emerald-600" />
@@ -88,8 +103,9 @@ const DashboardAdmin = () => {
                     </div>
                 </div>
 
-                {/* GRAFIK & PIE CHART GRID (Sementar Visualisasi CSS) */}
+                {/* GRAFIK & PIE CHART GRID */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Tren Pertumbuhan */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2">
                         <h4 className="font-bold text-slate-800 text-sm mb-6">Pertumbuhan UMKM</h4>
                         <div className="h-48 flex items-end justify-between border-b border-l border-slate-100 px-4 pb-2 relative">
@@ -98,25 +114,42 @@ const DashboardAdmin = () => {
                             <div className="text-center w-1/4 text-[10px] text-gray-400 font-medium">Jan<div className="h-2 w-2 bg-purple-500 rounded-full mx-auto -mt-16 border-2 border-white shadow-sm"></div></div>
                             <div className="text-center w-1/4 text-[10px] text-gray-400 font-medium">Feb<div className="h-2 w-2 bg-purple-500 rounded-full mx-auto -mt-20 border-2 border-white shadow-sm"></div></div>
                             <div className="text-center w-1/4 text-[10px] text-gray-400 font-medium">Mar<div className="h-2 w-2 bg-purple-500 rounded-full mx-auto -mt-24 border-2 border-white shadow-sm"></div></div>
-                            <div className="text-center w-1/4 text-[10px] text-gray-400 font-medium">Apr<div className="h-2 w-2 bg-purple-500 rounded-full mx-auto -mt-32 border-2 border-white shadow-sm"></div></div>
+                            <div className="text-center w-1/4 text-[10px] text-gray-400 font-medium">Apr<div style={{ marginBottom: `${Math.min(stats.totalUMKM * 10, 120)}px` }} className="h-2.5 w-2.5 bg-purple-600 rounded-full mx-auto border-2 border-white shadow transition-all duration-1000"></div></div>
                         </div>
                     </div>
 
+                    {/* 🔥 PERBAIKAN TOTAL BOX DIAGRAM LINGKARAN */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
-                        <h4 className="font-bold text-slate-800 text-sm mb-4">UMKM Berdasarkan Kategori</h4>
-                        <div className="flex justify-center my-2">
-                            <div className="w-32 h-32 rounded-full border-[24px] border-blue-500 border-r-purple-400 border-b-orange-400 border-l-emerald-400"></div>
+                        <h4 className="font-bold text-slate-800 text-sm mb-2">UMKM Berdasarkan Kategori</h4>
+                        
+                        {/* Bulatan Diagram Menggunakan Conic Gradient Dinamis Murni */}
+                        <div className="flex justify-center my-4">
+                            <div 
+                                className="w-32 h-32 rounded-full shadow-inner transition-all duration-500"
+                                style={{ background: `conic-gradient(${conicGradientString})` }}
+                            ></div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-500 font-medium pt-4">
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 bg-blue-500 rounded-full inline-block"></span> Makanan & Minuman</div>
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 bg-emerald-400 rounded-full inline-block"></span> Fashion</div>
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 bg-orange-400 rounded-full inline-block"></span> Kerajinan</div>
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 bg-purple-400 rounded-full inline-block"></span> Ritel</div>
+
+                        {/* LEGENDA DENGAN ANGKA PERSENTASE REAL DATABASE */}
+                        <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-500 font-medium pt-3 border-t border-slate-100">
+                            {umkmKategori.length === 0 ? (
+                                <p className="col-span-2 text-center text-gray-400">Belum ada kategori data.</p>
+                            ) : (
+                                umkmKategori.map((item, index) => (
+                                    <div key={index} className="flex items-center gap-1.5 truncate">
+                                        <span 
+                                            className="w-2.5 h-2.5 rounded-md inline-block flex-shrink-0" 
+                                            style={{ backgroundColor: colors[index % colors.length] }}
+                                        ></span>
+                                        <span className="truncate">{item.name} ({item.percent}%)</span>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* TABEL DAFTAR UMKM TERDAFTAR (DATA REAL) */}
+                {/* TABEL DAFTAR UMKM TERDAFTAR */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-50">
                         <h4 className="font-bold text-slate-800 text-sm">Daftar UMKM Terdaftar</h4>

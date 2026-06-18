@@ -23,7 +23,7 @@ const AdminLayout = ({ children }) => {
   const menuItems = [
     {
       path: '/admin/dashboard',
-      name: 'Dashboard Monitor',
+      name: 'Dashboard',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
@@ -32,7 +32,7 @@ const AdminLayout = ({ children }) => {
     },
     {
       path: '/admin/umkm',
-      name: 'Data Mitra UMKM',
+      name: 'Data UMKM',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.5a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75h-3.5a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
@@ -50,7 +50,7 @@ const AdminLayout = ({ children }) => {
     },
     {
       path: '/admin/laporan',
-      name: 'Laporan Rekapitulasi',
+      name: 'Laporan',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
@@ -60,7 +60,7 @@ const AdminLayout = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex font-sans antialiased">
+    <div className="min-h-screen bg-[#f8fafc] print:bg-white flex font-sans antialiased">
       {/* SIDEBAR MONITORING ADMIN */}
       <aside className="w-64 bg-white border-r border-slate-100 flex flex-col justify-between p-6 fixed h-full z-40 print:hidden">
         <div className="space-y-8">
@@ -108,7 +108,9 @@ const AdminLayout = ({ children }) => {
       </aside>
 
       {/* HEADER & MAIN SUB-CONTENT CONTAINER */}
-      <div className="flex-1 pl-64 flex flex-col min-h-screen">
+      {/* Tambahan print:pl-0 untuk menghilangkan margin/padding saat print */}
+      <div className="flex-1 pl-64 print:pl-0 flex flex-col min-h-screen print:min-h-0 print:bg-white">
+        
         <header className="h-16 bg-white border-b border-slate-100 px-10 flex justify-end items-center fixed right-0 left-64 top-0 bg-white/80 backdrop-blur-md z-30 print:hidden">
           <div className="flex items-center gap-3">
             <div className="text-right">
@@ -123,9 +125,11 @@ const AdminLayout = ({ children }) => {
           </div>
         </header>
 
-        <main className="pt-24 p-8 flex-1 max-w-[1200px] w-full mx-auto print:pt-0 print:p-0">
+        {/* Tambahan print:max-w-none print:m-0 agar konten bisa memenuhi layar penuh saat diprint */}
+        <main className="pt-24 p-8 flex-1 max-w-[1200px] w-full mx-auto print:max-w-none print:pt-0 print:p-0 print:m-0">
           {children}
         </main>
+        
       </div>
     </div>
   );

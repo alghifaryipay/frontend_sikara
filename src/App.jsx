@@ -14,6 +14,7 @@ import UmkmProduk from './pages/UmkmProduk';
 import UmkmLaporan from './pages/UmkmLaporan';
 import ProtectedRoute from './components/ProtectedRoute';
 import UmkmKasir from './pages/UmkmKasir';
+import UmkmSetting from './pages/UmkmSetting';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/umkm/produk" element={<ProtectedRoute allowedRoles={['umkm']}><UmkmProduk /></ProtectedRoute>} />
         <Route path="/umkm/laporan" element={<ProtectedRoute allowedRoles={['umkm']}><UmkmLaporan /></ProtectedRoute>} />
         <Route path="/umkm/kasir" element={<ProtectedRoute allowedRoles={['umkm']}><UmkmKasir /></ProtectedRoute>} />
+        <Route path="/umkm/setting" element={<ProtectedRoute allowedRoles={['umkm']}><UmkmSetting /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

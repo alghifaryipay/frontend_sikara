@@ -16,7 +16,7 @@ const DashboardUmkm = () => {
             return;
         }
 
-        fetch(`http://localhost:5000/api/umkm/dashboard-full/${savedUserId}`)
+        fetch(`https://backend-sikara.onrender.com/api/umkm/dashboard-full/${savedUserId}`)
             .then((res) => {
                 if (!res.ok) throw new Error('Gagal mengambil data dari server');
                 return res.json();

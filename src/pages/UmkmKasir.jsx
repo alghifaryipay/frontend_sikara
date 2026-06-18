@@ -29,7 +29,7 @@ const UmkmKasir = () => {
       return;
     }
 
-    fetch(`http://localhost:5000/api/umkm/products/${userId}`)
+    fetch(`https://backend-sikara.onrender.com/api/umkm/products/${userId}`)
       .then((res) => res.json())
       .then((resData) => {
         setBusinessName(resData.businessName || 'Toko UMKM');
@@ -107,7 +107,7 @@ const UmkmKasir = () => {
       items: cart // 🔥 Mengirimkan seluruh array belanjaan sekaligus!
     };
 
-    fetch('http://localhost:5000/api/umkm/orders-manual', {
+    fetch('https://backend-sikara.onrender.com/api/umkm/orders-manual', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
