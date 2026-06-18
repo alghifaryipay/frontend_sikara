@@ -4,7 +4,7 @@ import { UmkmIcon, UserIcon } from '../components/Icons';
 
 const Register = () => {
     // State untuk menyimpan data form
-    const [role, setRole] = useState('pengguna'); 
+    const [role, setRole] = useState('pengguna');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -14,7 +14,7 @@ const Register = () => {
     const [businessName, setBusinessName] = useState('');
     const [phone, setPhone] = useState('');
     const [location, setLocation] = useState('');
-    const [category, setCategory] = useState('Makanan & Minuman');
+    const [category, setCategory] = useState('');
 
     // 🔥 STATE BARU: Khusus Upload Logo
     const [selectedFile, setSelectedFile] = useState(null);
@@ -182,11 +182,21 @@ const Register = () => {
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-slate-700 block mb-1">Kategori UMKM</label>
-                                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-50">
-                                        <option value="Makanan & Minuman">Makanan & Minuman</option>
-                                        <option value="Fashion">Fashion</option>
-                                        <option value="Kerajinan">Kerajinan</option>
-                                        <option value="Ritel">Ritel</option>
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        required
+                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-50 cursor-pointer"
+                                    >
+                                        <option value="" disabled hidden>-- Pilih Kategori UMKM --</option>
+                                        <option value="Kuliner">Kuliner (Makanan & Minuman)</option>
+                                        <option value="Fashion">Fashion & Pakaian</option>
+                                        <option value="Kerajinan">Kerajinan Tangan / Souvenir</option>
+                                        <option value="Otomotif">Otomotif & Kendaraan</option>
+                                        <option value="Ritel">Ritel & Kelontong</option>
+                                        <option value="Agrobisnis">Pertanian / Agrobisnis</option>
+                                        <option value="Jasa">Jasa / Layanan Umum</option>
+                                        <option value="Lainnya">Lainnya</option>
                                     </select>
                                 </div>
                             </div>

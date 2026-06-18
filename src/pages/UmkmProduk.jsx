@@ -5,7 +5,7 @@ import UmkmLayout from '../components/UmkmLayout';
 const UmkmProduk = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
-  
+
   // State Asli bawaan data toko Anda (Ditambah umkmId untuk foreign key DB)
   const [data, setData] = useState({ businessName: '', umkmId: null, products: [] });
   const [search, setSearch] = useState('');
@@ -13,9 +13,9 @@ const UmkmProduk = () => {
 
   // State untuk mengendalikan Modal Tambah & Edit Produk
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false); 
-  const [editId, setEditId] = useState(null); 
-  
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
+
   // State Khusus Loading saat Upload
   const [isUploading, setIsUploading] = useState(false);
 
@@ -135,11 +135,11 @@ const UmkmProduk = () => {
     const payload = {
       umkm_id: data.umkmId,
       ...formData,
-      image_url: finalImageUrl 
+      image_url: finalImageUrl
     };
 
-    const url = isEditMode 
-      ? `https://backend-sikara.onrender.com/api/umkm/products/${editId}` 
+    const url = isEditMode
+      ? `https://backend-sikara.onrender.com/api/umkm/products/${editId}`
       : 'https://backend-sikara.onrender.com/api/umkm/products';
     const method = isEditMode ? 'PUT' : 'POST';
 
@@ -151,8 +151,8 @@ const UmkmProduk = () => {
       .then((res) => res.json())
       .then((resData) => {
         alert(resData.message || 'Perubahan berhasil disimpan!');
-        setIsModalOpen(false); 
-        fetchProducts(); 
+        setIsModalOpen(false);
+        fetchProducts();
       })
       .catch((err) => console.error("Gagal memproses produk:", err))
       .finally(() => setIsUploading(false));
@@ -167,7 +167,7 @@ const UmkmProduk = () => {
         .then((res) => res.json())
         .then((resData) => {
           alert(resData.message || 'Produk berhasil dihapus!');
-          fetchProducts(); 
+          fetchProducts();
         })
         .catch((err) => console.error('Error menghapus produk:', err));
     }
@@ -190,14 +190,14 @@ const UmkmProduk = () => {
   return (
     <UmkmLayout>
       <div className="space-y-6 w-full max-w-[1200px] mx-auto">
-        
+
         {/* HEADER MENU */}
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Manajemen Produk</h1>
             <p className="text-xs text-gray-400 mt-0.5 font-medium">Kelola dan terbitkan semua komoditas dari {data.businessName}</p>
           </div>
-          <button 
+          <button
             onClick={openAddModal}
             className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-blue-100 flex items-center gap-1.5"
           >
@@ -268,7 +268,7 @@ const UmkmProduk = () => {
                       {/* 🔥 AREA TOMBOL EDIT & HAPUS */}
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-2">
-                          <button 
+                          <button
                             onClick={() => openEditModal(prod)}
                             className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit Produk"
@@ -277,7 +277,7 @@ const UmkmProduk = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                             </svg>
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(prod.id, prod.title)}
                             className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                             title="Hapus Produk"
@@ -314,7 +314,7 @@ const UmkmProduk = () => {
                     {isEditMode ? 'Perbarui detail komoditas etalase Anda' : 'Terbitkan komoditas jualan ke ekosistem SIKaRa'}
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsModalOpen(false)}
                   className="text-gray-400 hover:text-slate-600 transition-colors"
                 >
@@ -325,7 +325,7 @@ const UmkmProduk = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                
+
                 {/* 🔥 FITUR BARU: AREA UPLOAD GAMBAR */}
                 <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
                   <div className="w-16 h-16 bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
@@ -339,11 +339,11 @@ const UmkmProduk = () => {
                   </div>
                   <div className="flex-1">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Foto Produk</label>
-                    <input 
-                      type="file" 
+                    <input
+                      type="file"
                       accept="image/*"
                       onChange={handleFileChange}
-                      className="w-full text-slate-500 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer" 
+                      className="w-full text-slate-500 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -351,10 +351,10 @@ const UmkmProduk = () => {
                 {/* Nama Produk */}
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Nama Produk</label>
-                  <input 
+                  <input
                     type="text" required
                     value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="Contoh: Bouquet Mawar Merah Premium"
                     className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
                   />
@@ -363,18 +363,21 @@ const UmkmProduk = () => {
                 {/* Kategori */}
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Kategori Usaha</label>
-                  <select 
+                  <select
                     required
                     value={formData.category_name}
-                    onChange={(e) => setFormData({...formData, category_name: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, category_name: e.target.value })}
                     className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all cursor-pointer"
                   >
                     <option value="" disabled hidden>-- Pilih Kategori Produk --</option>
                     <option value="Kuliner">Kuliner (Makanan & Minuman)</option>
                     <option value="Fashion">Fashion & Pakaian</option>
-                    <option value="Kerajinan">Kerajinan Tangan / Bouquet</option>
+                    <option value="Kerajinan">Kerajinan Tangan / Souvenir</option>
+                    <option value="Otomotif">Otomotif & Kendaraan</option>
+                    <option value="Ritel">Ritel & Kelontong</option>
                     <option value="Agrobisnis">Pertanian / Agrobisnis</option>
-                    <option value="Jasa">Jasa / Layanan</option>
+                    <option value="Jasa">Jasa / Layanan Umum</option>
+                    <option value="Lainnya">Lainnya</option>
                   </select>
                 </div>
 
@@ -382,20 +385,20 @@ const UmkmProduk = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Harga (Rp)</label>
-                    <input 
+                    <input
                       type="number" required min="0"
                       value={formData.price}
-                      onChange={(e) => setFormData({...formData, price: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                       placeholder="50000"
                       className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
                     />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Stok Barang</label>
-                    <input 
+                    <input
                       type="number" required min="0"
                       value={formData.stock}
-                      onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                       placeholder="25"
                       className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400 focus:bg-white transition-all"
                     />
@@ -404,7 +407,7 @@ const UmkmProduk = () => {
 
                 {/* Tombol Aksi */}
                 <div className="flex gap-2 pt-3 border-t border-slate-50">
-                  <button 
+                  <button
                     type="button"
                     disabled={isUploading}
                     onClick={() => setIsModalOpen(false)}
@@ -412,12 +415,11 @@ const UmkmProduk = () => {
                   >
                     Batal
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     disabled={isUploading}
-                    className={`w-1/2 text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm ${
-                      isUploading ? 'bg-blue-300' : isEditMode ? 'bg-purple-500 hover:bg-purple-600 shadow-purple-100' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-100'
-                    }`}
+                    className={`w-1/2 text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm ${isUploading ? 'bg-blue-300' : isEditMode ? 'bg-purple-500 hover:bg-purple-600 shadow-purple-100' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-100'
+                      }`}
                   >
                     {isUploading ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Terbitkan Produk'}
                   </button>
